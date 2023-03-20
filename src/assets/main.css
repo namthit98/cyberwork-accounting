@@ -1,0 +1,7 @@
+@tailwind utilities;
+
+.n-menu .n-menu-item,
+.n-menu .n-submenu {
+  margin-top: 1px !important;
+  height: 44px;
+}
