@@ -1,4 +1,4 @@
-export interface ICreateOrganizationDto {
+export interface ICreateUpdateOrganizationDto {
   code: string
   name: string
   shortName?: string
@@ -6,6 +6,10 @@ export interface ICreateOrganizationDto {
   organizationLevel: string | null
   address?: string
 }
+
+export interface ICreateOrganizationDto extends ICreateUpdateOrganizationDto {}
+
+export interface IUpdateOrganizationDto extends ICreateUpdateOrganizationDto {}
 
 export interface IOrganizationDto {
   id: string

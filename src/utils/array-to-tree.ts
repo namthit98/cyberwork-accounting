@@ -13,7 +13,7 @@ export default function arrayToTree<T>(
 
   data.forEach((item: Node & T) => {
     const { id, [parentKey]: parentId, ...rest } = item
-    lookup[id] = { id, ...rest } as Node & T
+    lookup[id] = { id, [parentKey]: item[parentKey], ...rest } as Node & T
     const parentNode = lookup[parentId]
     if (parentNode) {
       parentNode.children = parentNode.children || []

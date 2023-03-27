@@ -1,27 +1,51 @@
 <script setup lang="ts">
-import AppModalLayout from '@/components/layouts/AppModalLayout.vue'
+import BaseModalLayout from '@/components/layouts/BaseModalLayout.vue'
 import OrganizationForm from '@/components/setting/organization/OrganizationForm.vue'
-import { useOrganizationStore } from '@/store/OrganizationStore'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useOrganizationStore } from '@/stores/OrganizationStore'
+import { computed, ref, watch, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 const props = defineProps<{
   show: boolean
 }>()
-const title = 'Thêm đơn vị'
 
+const route = useRoute()
 const router = useRouter()
 const organizationStore = useOrganizationStore()
 const organizationForm = ref<InstanceType<typeof OrganizationForm> | null>(null)
+const $isEdit = computed(() => route.meta.view === 'edit')
+const $title = computed(() =>
+  $isEdit.value ? 'Chỉnh sửa đơn vị' : 'Thêm đơn vị'
+)
 
 const saveHandler = () => organizationForm.value?.submit()
+
+watch(
+  () => route.params.id,
+  (newValue) => {
+    if (!newValue) {
+      organizationStore.organization = null
+    }
+
+    if (newValue && typeof newValue === 'string') {
+      organizationStore.fetchOrganization(newValue)
+    }
+  }
+)
+
+onMounted(() => {
+  if (route.params.id && typeof route.params.id === 'string') {
+    organizationStore.fetchOrganization(route.params.id)
+  }
+})
 </script>
 
 <template>
-  <app-modal-layout
-    :title="title"
+  <base-modal-layout
+    :title="$title"
     :show="props.show"
-    :loading="organizationStore.isCreateLoading"
+    :loading="organizationStore.isFormLoading"
+    :canCreateMore="!$isEdit"
     @close="router.push({ name: 'organizations' })"
     @save="saveHandler"
     v-slot="slotProps"
@@ -30,5 +54,5 @@ const saveHandler = () => organizationForm.value?.submit()
       ref="organizationForm"
       @close="!slotProps.isCreateMore && router.push({ name: 'organizations' })"
     />
-  </app-modal-layout>
+  </base-modal-layout>
 </template>

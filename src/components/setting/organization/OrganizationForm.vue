@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useOrganizationStore } from '@/store/OrganizationStore'
-import type { ICreateOrganizationDto } from '@/types/Organization'
+import { useOrganizationStore } from '@/stores/OrganizationStore'
+import type { ICreateOrganizationDto } from '@/types/organization'
 import get from 'lodash.get'
 import {
   NForm,
@@ -15,7 +15,8 @@ import {
   type FormValidationError,
   useMessage
 } from 'naive-ui'
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
 const emit = defineEmits(['close'])
 
@@ -30,9 +31,11 @@ const organizationLevelOptions = [
   { value: 'PHAN_XUONG', label: 'Phân xưởng' }
 ]
 
+const route = useRoute()
 const organizationStore = useOrganizationStore()
 const message = useMessage()
 const formRef = ref<FormInst | null>(null)
+const nameRef = ref<HTMLInputElement | null>(null)
 const formValue = ref<ICreateOrganizationDto>({
   code: '',
   name: '',
@@ -41,6 +44,8 @@ const formValue = ref<ICreateOrganizationDto>({
   organizationLevel: null,
   address: ''
 })
+const $isEdit = computed(() => route.meta.view === 'edit')
+
 const rules = {
   code: {
     required: true,
@@ -68,37 +73,65 @@ const submit = () => {
   formRef.value?.validate(
     async (errors: Array<FormValidationError> | undefined) => {
       if (!errors) {
-        organizationStore.$patch({
-          isCreateLoading: true
-        })
-
-        try {
-          await organizationStore.createOrganization(formValue.value)
-          emit('close')
-        } catch (err) {
-          message.error(get(err, 'response.data.detail', 'Tạo đơn vị thất bại'))
+        if ($isEdit.value) {
+          edit()
+        } else {
+          create()
         }
-
-        organizationStore.$patch({
-          isCreateLoading: false
-        })
-      } else {
-        console.log(errors)
       }
     }
   )
 }
+
+const create = async () => {
+  try {
+    await organizationStore.createOrganization(formValue.value)
+    nameRef.value?.focus()
+    emit('close')
+  } catch (err) {
+    message.error(get(err, 'response.data.detail', 'Tạo đơn vị thất bại'))
+  }
+}
+
+const edit = async () => {
+  if (!organizationStore.organization?.id) return
+
+  try {
+    await organizationStore.updateOrganization(
+      organizationStore.organization.id,
+      formValue.value
+    )
+    emit('close')
+  } catch (err) {
+    message.error(get(err, 'response.data.detail', 'Cập nhật đơn vị thất bại'))
+  }
+}
+
+watch(
+  () => organizationStore.organization,
+  (newValue) => {
+    if (!newValue) return
+
+    formValue.value.code = newValue.code
+    formValue.value.name = newValue.name
+    formValue.value.shortName = newValue.shortName
+    formValue.value.underOrganizationId = newValue.underOrganizationId
+    formValue.value.organizationLevel = newValue.organizationLevel
+    formValue.value.address = newValue.address
+  }
+)
 
 defineExpose({ submit })
 </script>
 
 <template>
   <n-form ref="formRef" :model="formValue" :rules="rules">
-    <n-spin :show="organizationStore.isCreateLoading">
+    <n-spin :show="organizationStore.isFormLoading">
       <n-grid cols="3" x-gap="12">
         <n-grid-item span="2">
           <n-form-item style="flex: 1" label="Tên đơn vị" path="name">
             <n-input
+              ref="nameRef"
               v-model:value="formValue.name"
               placeholder="Nhập tên đơn vị"
             />
@@ -107,7 +140,11 @@ defineExpose({ submit })
 
         <n-grid-item>
           <n-form-item label="Mã đơn vị" path="code">
-            <n-input v-model:value="formValue.code" placeholder="Mã đơn vị" />
+            <n-input
+              v-model:value="formValue.code"
+              :disabled="$isEdit"
+              placeholder="Mã đơn vị"
+            />
           </n-form-item>
         </n-grid-item>
 
@@ -124,6 +161,7 @@ defineExpose({ submit })
           <n-form-item label="Thuộc bộ phận" path="underOrganizationId">
             <n-tree-select
               :options="organizationStore.$organizationTree"
+              :disabled="$isEdit"
               v-model:value="formValue.underOrganizationId"
             />
           </n-form-item>
@@ -134,6 +172,7 @@ defineExpose({ submit })
             <n-select
               v-model:value="formValue.organizationLevel"
               :options="organizationLevelOptions"
+              :disabled="$isEdit"
               placeholder="Cấp tổ chức"
             />
           </n-form-item>

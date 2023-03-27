@@ -18,128 +18,17 @@ import {
   NListItem,
   NThing
 } from 'naive-ui'
-import { DashboardOutlined, BellOutlined, LogoutOutlined, FullscreenOutlined } from '@vicons/antd'
+import {
+  DashboardOutlined,
+  BellOutlined,
+  LogoutOutlined,
+  FullscreenOutlined
+} from '@vicons/antd'
 import renderIcon from '@/utils/render-icon'
 import { RouterLink } from 'vue-router'
 import { h } from 'vue'
-
-const options = [
-  {
-    label: 'Rubber Soul',
-    key: 'Rubber Soul',
-    children: [
-      {
-        label: "Everybody's Got Something to Hide Except Me and My Monkey",
-        key: "Everybody's Got Something to Hide Except Me and My Monkey"
-      },
-      {
-        label: 'Drive My Car',
-        key: 'Drive My Car',
-        disabled: true
-      },
-      {
-        label: 'Norwegian Wood',
-        key: 'Norwegian Wood'
-      },
-      {
-        label: "You Won't See",
-        key: "You Won't See",
-        disabled: true
-      },
-      {
-        label: 'Nowhere Man',
-        key: 'Nowhere Man'
-      },
-      {
-        label: 'Think For Yourself',
-        key: 'Think For Yourself'
-      },
-      {
-        label: 'The Word',
-        key: 'The Word'
-      },
-      {
-        label: 'Michelle',
-        key: 'Michelle',
-        disabled: true
-      },
-      {
-        label: 'What goes on',
-        key: 'What goes on'
-      },
-      {
-        label: 'Girl',
-        key: 'Girl'
-      },
-      {
-        label: "I'm looking through you",
-        key: "I'm looking through you"
-      },
-      {
-        label: 'In My Life',
-        key: 'In My Life'
-      },
-      {
-        label: 'Wait',
-        key: 'Wait'
-      }
-    ]
-  },
-  {
-    label: 'Let It Be',
-    key: 'Let It Be Album',
-    children: [
-      {
-        label: 'Two Of Us',
-        key: 'Two Of Us'
-      },
-      {
-        label: 'Dig A Pony',
-        key: 'Dig A Pony'
-      },
-      {
-        label: 'Across The Universe',
-        key: 'Across The Universe'
-      },
-      {
-        label: 'I Me Mine',
-        key: 'I Me Mine'
-      },
-      {
-        label: 'Dig It',
-        key: 'Dig It'
-      },
-      {
-        label: 'Let It Be',
-        key: 'Let It Be'
-      },
-      {
-        label: 'Maggie Mae',
-        key: 'Maggie Mae'
-      },
-      {
-        label: "I've Got A Feeling",
-        key: "I've Got A Feeling"
-      },
-      {
-        label: 'One After 909',
-        key: 'One After 909'
-      },
-      {
-        label: 'The Long And Winding Road',
-        key: 'The Long And Winding Road'
-      },
-      {
-        label: 'For You Blue',
-        key: 'For You Blue'
-      },
-      {
-        label: 'Get Back',
-        key: 'Get Back'
-      }
-    ]
-  }
-]
+import { useOrganizationStore } from '@/stores/OrganizationStore'
+import { useGlobalStore } from '@/stores/GlobalStore'
 
 const menuOptions = [
   {
@@ -257,7 +146,13 @@ const menuOptions = [
   }
 ]
 
-const handleSelect = (key: string | number) => {
+const globalStore = useGlobalStore()
+const organizationStore = useOrganizationStore()
+
+const updateOrganizationHandler = (key: string) => {
+  globalStore.currentOrganization = key
+}
+const handleSelect = (key: string) => {
   console.log(key)
 }
 </script>
@@ -265,22 +160,48 @@ const handleSelect = (key: string | number) => {
 <template>
   <n-space vertical>
     <n-layout>
-      <n-layout-header bordered class="flex h-14 items-center justify-between px-2">
-        <n-h2 class="mb-0 text-[#18a058]" :type="'success'">CyberWork Accounting</n-h2>
+      <n-layout-header
+        bordered
+        class="flex h-14 items-center justify-between px-2"
+      >
+        <n-h2 class="mb-0 text-[#18a058]" :type="'success'"
+          >CyberWork Accounting</n-h2
+        >
         <n-space class="self-stretch" size="small">
           <n-space :align="'center'" class="h-full">
-            <n-tree-select class="w-80" filterable :options="options" />
+            <n-tree-select
+              class="w-80"
+              filterable
+              :options="organizationStore.$organizationTree"
+              :value="globalStore.currentOrganization"
+              @update:value="updateOrganizationHandler"
+            />
           </n-space>
 
-          <n-space :align="'center'" class="h-full cursor-pointer px-3 hover:bg-[#f6f6f6]">
-            <n-icon class="mt-1" color="black" size="24" :component="FullscreenOutlined"></n-icon>
+          <n-space
+            :align="'center'"
+            class="h-full cursor-pointer px-3 hover:bg-[#f6f6f6]"
+          >
+            <n-icon
+              class="mt-1"
+              color="black"
+              size="24"
+              :component="FullscreenOutlined"
+            ></n-icon>
           </n-space>
 
           <n-popover placement="bottom-end" trigger="click">
             <template #trigger>
-              <n-space :align="'center'" class="h-full cursor-pointer px-3 hover:bg-[#f6f6f6]">
+              <n-space
+                :align="'center'"
+                class="h-full cursor-pointer px-3 hover:bg-[#f6f6f6]"
+              >
                 <n-badge value="9+">
-                  <n-icon color="black" size="24" :component="BellOutlined"></n-icon>
+                  <n-icon
+                    color="black"
+                    size="24"
+                    :component="BellOutlined"
+                  ></n-icon>
                 </n-badge>
               </n-space>
             </template>
@@ -297,8 +218,9 @@ const handleSelect = (key: string | number) => {
                 <n-thing description="">
                   <template #description>
                     <p>
-                      Lorem ipsum dolor sit, amet consectetur adipisicing elit. Laudantium adipisci
-                      illum totam eum praesentium, dolore molestiae et quo?
+                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                      Laudantium adipisci illum totam eum praesentium, dolore
+                      molestiae et quo?
                     </p>
                   </template>
                 </n-thing>
@@ -308,8 +230,9 @@ const handleSelect = (key: string | number) => {
                 <n-thing description="">
                   <template #description>
                     <p>
-                      Lorem ipsum dolor sit, amet consectetur adipisicing elit. Laudantium adipisci
-                      illum totam eum praesentium, dolore molestiae et quo?
+                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                      Laudantium adipisci illum totam eum praesentium, dolore
+                      molestiae et quo?
                     </p>
                   </template>
                 </n-thing>
@@ -319,8 +242,9 @@ const handleSelect = (key: string | number) => {
                 <n-thing description="">
                   <template #description>
                     <p>
-                      Lorem ipsum dolor sit, amet consectetur adipisicing elit. Laudantium adipisci
-                      illum totam eum praesentium, dolore molestiae et quo?
+                      Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                      Laudantium adipisci illum totam eum praesentium, dolore
+                      molestiae et quo?
                     </p>
                   </template>
                 </n-thing>
@@ -330,10 +254,19 @@ const handleSelect = (key: string | number) => {
 
           <n-dropdown
             trigger="click"
-            :options="[{ label: 'Đăng xuất', key: 'logout', icon: renderIcon(LogoutOutlined) }]"
+            :options="[
+              {
+                label: 'Đăng xuất',
+                key: 'logout',
+                icon: renderIcon(LogoutOutlined)
+              }
+            ]"
             @select="handleSelect"
           >
-            <n-space :align="'center'" class="h-full cursor-pointer px-3 hover:bg-[#f6f6f6]">
+            <n-space
+              :align="'center'"
+              class="h-full cursor-pointer px-3 hover:bg-[#f6f6f6]"
+            >
               <n-avatar
                 round
                 object-fit="cover"
@@ -357,7 +290,12 @@ const handleSelect = (key: string | number) => {
           :width="240"
           :native-scrollbar="false"
         >
-          <n-menu inverted :collapsed-width="64" :collapsed-icon-size="22" :options="menuOptions" />
+          <n-menu
+            inverted
+            :collapsed-width="64"
+            :collapsed-icon-size="22"
+            :options="menuOptions"
+          />
         </n-layout-sider>
         <n-layout-content class="bg-neutral-100">
           <router-view />

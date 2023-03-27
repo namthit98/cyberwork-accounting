@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { NGrid, NGridItem, NCard, NText } from 'naive-ui'
 import { useRouter } from 'vue-router'
-import AppListLayout from '@/components/layouts/AppListLayout.vue'
+import BaseListLayout from '@/components/layouts/BaseListLayout.vue'
 
 const router = useRouter()
 
@@ -15,7 +15,7 @@ const items = [
 </script>
 
 <template>
-  <app-list-layout :title="pageTitle">
+  <base-list-layout :title="pageTitle">
     <n-grid
       cols="2 s:3 m:4 l:5 xl:6 2xl:7"
       responsive="screen"
@@ -32,5 +32,5 @@ const items = [
         </n-card>
       </n-grid-item>
     </n-grid>
-  </app-list-layout>
+  </base-list-layout>
 </template>

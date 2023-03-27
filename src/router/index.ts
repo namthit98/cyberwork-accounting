@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import MainLayout from '@/components/layouts/AppLayout.vue'
+import BaseLayout from '@/components/layouts/BaseLayout.vue'
 import DashboardView from '@/views/dashboard/DashboardView.vue'
 
 const router = createRouter({
@@ -7,7 +7,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      component: MainLayout,
+      component: BaseLayout,
       children: [
         {
           path: '',
@@ -45,6 +45,13 @@ const router = createRouter({
                   path: 'create',
                   name: 'create-organization',
                   meta: { view: 'create' },
+                  component: () =>
+                    import('@/views/setting/OrganizationView.vue')
+                },
+                {
+                  path: ':id/edit',
+                  name: 'edit-organization',
+                  meta: { view: 'edit' },
                   component: () =>
                     import('@/views/setting/OrganizationView.vue')
                 }
